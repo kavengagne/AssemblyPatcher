@@ -50,18 +50,15 @@ namespace AssemblyPatcher.Core.Base
 
         public bool ApplyPatches()
         {
-            bool patchesApplied = false;
+            var patchesApplied = false;
             InjectAssets();
-            foreach (var candidate in Candidates)
+            for (var index = Patches.Count - 1; index >= 0; index--)
             {
-                for (var index = Patches.Count - 1; index >= 0; index--)
+                var patch = Patches[index];
+                foreach (var candidate in Candidates.Where(c => !c.Method.HasPatch(patch)))
                 {
-                    var patch = Patches[index];
-                    if (!candidate.Method.HasPatch(patch))
-                    {
-                        var applied = patch.Apply(Module, Importer, candidate.Method);
-                        patchesApplied |= applied;
-                    }
+                    var applied = patch.Apply(Module, Importer, candidate.Method);
+                    patchesApplied |= applied;
                 }
             }
             return patchesApplied;

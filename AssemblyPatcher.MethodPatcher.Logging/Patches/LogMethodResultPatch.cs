@@ -43,7 +43,10 @@ namespace AssemblyPatch.Logging.Patches
             instructions.Add(Op(OpCodes.Dup));
             instructions.Add(Op(OpCodes.Ldc_I4, 1));
             instructions.Add(Op(OpCodes.Ldloc, resultLocal));
-            instructions.Add(Op(OpCodes.Box, method.ReturnType.ToTypeDefOrRef()));
+            if (method.ReturnType.IsValueType)
+            {
+                instructions.Add(Op(OpCodes.Box, method.ReturnType.ToTypeDefOrRef()));
+            }
             instructions.Add(Op(OpCodes.Stelem_Ref));
             instructions.Add(Op(OpCodes.Call, writeLine));
             instructions.Add(Op(OpCodes.Ldloc, resultLocal));

@@ -47,6 +47,8 @@ namespace AssemblyPatcher.Core.Base
 
         private void AddPatchAttributeToMethod(ModuleDef module, IHasCustomAttribute target, Tuple<int, int> opcodesRange)
         {
+            UpdateExistingPatchAttributes(target, opcodesRange);
+
             var patchAttribute = module.Types.FirstOrDefault(t => t.FullName == typeof(PatchAttribute).FullName);
             if (patchAttribute != null)
             {
@@ -56,6 +58,27 @@ namespace AssemblyPatcher.Core.Base
                     new CAArgument(module.CorLibTypes.Int32, opcodesRange.Item1),
                     new CAArgument(module.CorLibTypes.Int32, opcodesRange.Item2)
                 }));
+            }
+        }
+
+        private void UpdateExistingPatchAttributes(IHasCustomAttribute target, Tuple<int, int> opcodesRange)
+        {
+            var patchAttributes = target.CustomAttributes.Where(a => a.TypeFullName == typeof(PatchAttribute).FullName).ToList();
+            foreach (var attr in patchAttributes.Where(a => a.HasConstructorArguments && a.ConstructorArguments.Count >= 2))
+            {
+                var fromArgument = attr.ConstructorArguments[1];
+                if (_injectionPoint == InjectionPoint.Prefix)
+                {
+                    attr.ConstructorArguments[1] = new CAArgument(fromArgument.Type, (int)fromArgument.Value + opcodesRange.Item2);
+                }
+                // update only attributes where fromIndex >= this.fromIndex + this.instructionsCount
+                else if (_injectionPoint == InjectionPoint.Postfix)
+                {
+                    if ((int)fromArgument.Value >= opcodesRange.Item1 + opcodesRange.Item2)
+                    {
+                        attr.ConstructorArguments[1] = new CAArgument(fromArgument.Type, (int)fromArgument.Value + opcodesRange.Item2);
+                    }
+                }
             }
         }
 

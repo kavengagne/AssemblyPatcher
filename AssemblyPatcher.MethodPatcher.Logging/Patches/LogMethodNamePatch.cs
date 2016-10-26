@@ -11,9 +11,7 @@ using static AssemblyPatcher.Core.Helpers.InstructionHelper;
 
 namespace AssemblyPatch.Logging.Patches
 {
-    // TODO: KG - Add a way to recognize if the patch has already been applied to the method
     // TODO: KG - Support Patch Removal (also Add CanRemove virtual method
-    // TODO: KG - Add start, end index to PatchAttribute for patch removal
     public class LogMethodNamePatch : PatchBase, IMethodPatch
     {
         public LogMethodNamePatch() : base(InjectionPoint.Prefix) { }

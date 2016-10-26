@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 
 namespace CalculatorLib
 {
     public class Calculator
     {
-        [ComVisible(false)]
         public double Add(double op1, double op2)
         {
-            var result = 0;
-            foreach (var d in new[] { 1,2,3 })
-            {
-                result += d;
-            }
+            var result = op1 + op2;
             return result;
         }
 
